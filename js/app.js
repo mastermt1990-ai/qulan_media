@@ -60,7 +60,7 @@ function normalizeArticles(rows) {
 
 async function fetchCsvText(url) {
   const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`Жүктелмеді: ${res.status}`);
+  if (!res.ok) throw new Error("HTTP " + res.status);
   const text = await res.text();
   if (text.includes("Sign in") && text.includes("Google")) {
     throw new Error("Кесте жарияланбаған — Share → Anyone with the link (Viewer)");
@@ -68,19 +68,43 @@ async function fetchCsvText(url) {
   return text;
 }
 
+/** Google Sheets кейде 1-жолда «Столбец 1» қалады — id бағанын табамыз */
+function parseArticlesCsv(text) {
+  const lines = text.split(/\r?\n/).filter((line) => line.trim() !== "");
+  let startIdx = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const first = lines[i].split(",")[0].replace(/^"|"$/g, "").trim().toLowerCase();
+    if (first === "id") {
+      startIdx = i;
+      break;
+    }
+  }
+  return parseCSV(lines.slice(startIdx).join("\n"));
+}
+
+function filterValidArticles(rows) {
+  return rows.filter((row) => row.title && String(row.title).trim() !== "");
+}
+
 async function loadArticles() {
   if (articlesCache) return articlesCache;
 
-  let text;
+  let rows = [];
+  let source = "sheets";
+
   try {
-    text = await fetchCsvText(`${SHEETS_CSV_URL}&_=${Date.now()}`);
+    const text = await fetchCsvText(`${SHEETS_CSV_URL}&_=${Date.now()}`);
+    rows = filterValidArticles(parseArticlesCsv(text));
+    if (rows.length === 0) throw new Error("Кестеде мақала жоқ");
   } catch (sheetErr) {
     console.warn("Google Sheets:", sheetErr.message, "— жергілікті CSV қолданылады");
-    text = await fetchCsvText(LOCAL_CSV_PATH);
+    source = "local";
+    const text = await fetchCsvText(LOCAL_CSV_PATH);
+    rows = filterValidArticles(parseArticlesCsv(text));
   }
 
-  const rows = parseCSV(text);
-  if (rows.length === 0) throw new Error("Кестеде мақала жоқ");
+  if (rows.length === 0) throw new Error("Мақала табылмады");
+  console.info(`Жаңалықтар жүктелді: ${rows.length} (${source})`);
   articlesCache = normalizeArticles(rows);
   return articlesCache;
 }
@@ -220,7 +244,7 @@ const PLATFORM_META = {
 async function loadSocialPosts() {
   try {
     const text = await fetchCsvText(`${SOCIAL_CSV_URL}&_=${Date.now()}`);
-    return parseCSV(text).filter((r) => r.platform && r.text);
+    return parseArticlesCsv(text).filter((r) => r.platform && r.text);
   } catch (err) {
     console.warn("Әлеуметтік желі CSV:", err.message);
     return [];

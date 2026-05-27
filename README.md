@@ -19,9 +19,17 @@ npx --yes serve .
 
 1. [Кестені ашыңыз](https://docs.google.com/spreadsheets/d/1IRJWxPyANfO0h0RVSc7sW7RgVcxehJdw4rUiYTUBFuA/edit?gid=0#gid=0)
 2. **Share** → **General access** → **Anyone with the link** → рөл: **Viewer**
-3. 1-жолға бағандарды қойыңыз (төмендегі кесте)
-4. 2-жолдан мақалаларды жазыңыз
+3. **1-жолды** баған атауларымен толтырыңыз (төмендегі кесте)
+4. **2-жолдан** мақалаларды жазыңыз
 5. Сайтты жаңартыңыз (F5) — өзгеріс көрінеді
+
+> **Маңызды:** Егер 1-жолда «Столбец 1, Столбец 2...» болса — ол қатарды өшіріңіз. Бірінші жол `id,category,title,...` болуы керек.
+
+## GitHub Pages (сайт адресі)
+
+Сайт: **https://mastermt1990-ai.github.io/qulan_media/**
+
+GitHub → репо → **Settings** → **Pages** → **Source:** GitHub Actions (workflow push арқылы автоматты deploy).
 
 ## Мақала қосу / өзгерту
 
