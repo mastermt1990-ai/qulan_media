@@ -79,8 +79,7 @@ GitHub → репо → **Settings** → **Pages** → **Source:** GitHub Action
 | `title` | Тақырып |
 | `summary` | Қысқаша мәтін |
 | `content` | Толық мәтін |
-| `imageJpeg` | **Сурет (JPEG/PNG)** — тікелей сілтеме немесе Google Drive сілтемесі |
-| `imageUrl` | *(ескі)* — `imageJpeg` бос болса, осы қолданылады |
+| `imageUrl` | Сурет сілтемесі (https://...) |
 | `publishedAt` | Күн (YYYY-MM-DD) |
 | `views` | Көру саны |
 | `isFeatured` | `TRUE` — басты беттегі үлкен мақала (бір ғана) |
@@ -94,23 +93,6 @@ GitHub → репо → **Settings** → **Pages** → **Source:** GitHub Action
 - `isFeatured` және `isBreaking` үшін `TRUE` / `FALSE` (жоғары әріп).
 
 **Резерв:** кесте жарияланбаса, сайт `data/articles.csv` файлын қолданады.
-
-### Сурет қою (imageJpeg)
-
-Кестеге **`imageJpeg`** бағанын қосыңыз (6-баған, `content`-тен кейін):
-
-```
-id,category,title,summary,content,imageJpeg,publishedAt,views,isFeatured,isBreaking,slug
-```
-
-**Google Drive арқылы JPEG жүктеу:**
-
-1. JPEG файлды [Google Drive](https://drive.google.com)-ға жүктеңіз
-2. Файлға оң жақ басып → **Share** → **Anyone with the link** (Көрермен)
-3. **Copy link** — сілтемені `imageJpeg` бағанына қойыңыз
-4. Сайтты F5 жаңартыңыз — сурет hero мен карточкада көрінеді
-
-> Тікелей JPEG сілтеме де жарайды: `https://example.com/suret.jpg`
 
 ## Файл құрылымы
 
