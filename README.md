@@ -25,11 +25,48 @@ npx --yes serve .
 
 > **Маңызды:** Егер 1-жолда «Столбец 1, Столбец 2...» болса — ол қатарды өшіріңіз. Бірінші жол `id,category,title,...` болуы керек.
 
-## GitHub Pages (сайт адресі)
+## Railway deploy (негізгі хостинг)
+
+Сайт Railway-де Node.js сервер арқылы жұмыс істейді.
+
+### Алғашқы deploy (5 минут)
+
+1. [railway.com](https://railway.com) → тіркелу / кіру
+2. **New Project** → **Deploy from GitHub repo**
+3. `mastermt1990-ai/qulan_media` репосын таңдаңыз
+4. Railway автоматты build істейді (`npm install` → `npm start`)
+5. **Settings** → **Networking** → **Generate Domain** — тегін `.up.railway.app` домен аласыз
+
+### Автоматты жаңарту
+
+`main` тармағына әр push → Railway автоматты redeploy.
+
+### Локальді тест (Railway сияқты)
+
+```bash
+npm install
+npm start
+```
+
+Браузер: `http://localhost:3000`
+
+### Railway параметрлері (автоматты)
+
+| Файл | Мақсаты |
+|------|---------|
+| `package.json` | Node.js тәуелділіктері |
+| `server.js` | Статикалық файл сервері (`PORT` орта айнымалысы) |
+| `railway.toml` | Healthcheck, restart policy |
+| `nixpacks.toml` | Node.js 20, build командалары |
+| `Procfile` | `web: npm start` |
+
+> **Ескерту:** Google Sheets клиент жағында жүктеледі — Railway-де қосымша env айнымалылар қажет емес.
+
+## GitHub Pages (қосымша)
 
 Сайт: **https://mastermt1990-ai.github.io/qulan_media/**
 
-GitHub → репо → **Settings** → **Pages** → **Source:** GitHub Actions (workflow push арқылы автоматты deploy).
+GitHub → репо → **Settings** → **Pages** → **Source:** GitHub Actions.
 
 ## Мақала қосу / өзгерту
 
@@ -63,20 +100,24 @@ GitHub → репо → **Settings** → **Pages** → **Source:** GitHub Action
 media/
 ├── index.html          # Басты бет
 ├── article.html        # Бір мақала (?slug=...)
+├── server.js           # Railway / локаль сервер
+├── package.json        # Node.js конфиг
+├── railway.toml        # Railway deploy
 ├── css/styles.css
 ├── js/csv.js           # CSV парсер
 ├── js/app.js           # Жүктеу және көрсету
-├── data/articles.csv   # Мақалалар (сіз өңдейсіз)
+├── data/articles.csv   # Мақалалар (резерв)
 └── README.md
 ```
 
 ## Интернетке жариялау
 
-1. [Netlify](https://netlify.com) — қалтаны drag & drop
+1. **[Railway](https://railway.com)** — GitHub репосын қосу (негізгі, ұсынылады)
 2. [GitHub Pages](https://pages.github.com) — репоға push, Pages қосу
-3. [Vercel](https://vercel.com) — импорт
+3. [Netlify](https://netlify.com) — drag & drop
+4. [Vercel](https://vercel.com) — импорт
 
-Әр жаңа мақала: CSV өзгерту → қайта deploy.
+Google Sheets-ке мақала қосу → сайтты F5 — redeploy қажет емес.
 
 ## Тексеру
 
