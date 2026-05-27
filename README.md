@@ -79,7 +79,7 @@ GitHub → репо → **Settings** → **Pages** → **Source:** GitHub Action
 | `title` | Тақырып |
 | `summary` | Қысқаша мәтін |
 | `content` | Толық мәтін |
-| `imageUrl` | Сурет сілтемесі (https://...) |
+| `imageUrl` | Сурет сілтемесі (`https://...jpg`) немесе Google Drive сілтемесі |
 | `publishedAt` | Күн (YYYY-MM-DD) |
 | `views` | Көру саны |
 | `isFeatured` | `TRUE` — басты беттегі үлкен мақала (бір ғана) |
@@ -93,6 +93,8 @@ GitHub → репо → **Settings** → **Pages** → **Source:** GitHub Action
 - `isFeatured` және `isBreaking` үшін `TRUE` / `FALSE` (жоғары әріп).
 
 **Резерв:** кесте жарияланбаса, сайт `data/articles.csv` файлын қолданады.
+
+**Сурет (`imageUrl`):** ұяға Insert image емес — **сілтеме** жазыңыз. Google Drive: Share → Anyone with the link, сілтемені `imageUrl`-ге қойыңыз (автоматты түрде дұрыс форматқа айналдырылады).
 
 ## Файл құрылымы
 
