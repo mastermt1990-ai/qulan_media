@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QULAN MEDIA — Жаңалықтар порталы</title>
+  <link rel="icon" href="images/logo.png" type="image/png" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="top-bar">
+    <div class="container top-bar-inner">
+      <span>Бүгін: <strong id="today-date"></strong></span>
+      <nav class="top-links">
+        <a href="#">Жарнама</a>
+        <a href="#">Редакция</a>
+        <a href="#">Байланыс</a>
+      </nav>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="container header-main">
+      <a href="index.html" class="logo">
+        <img src="images/logo.png" alt="QULAN MEDIA" class="logo-icon" />
+        QULAN <span>MEDIA</span>
+      </a>
+      <nav class="nav-main">
+        <a href="index.html">ЖАҢАЛЫҚТАР</a>
+        <a href="index.html">ҚОҒАМ</a>
+        <a href="index.html">ЭКОНОМИКА</a>
+        <a href="index.html">РУХАНИЯТ</a>
+        <a href="index.html">СПОРТ</a>
+      </nav>
+      <div class="search-wrap">
+        <input type="search" class="search-input" placeholder="Іздеу..." aria-label="Іздеу" />
+      </div>
+    </div>
+  </header>
+
+  <div class="ticker">
+    <span class="ticker-label">СОҢҒЫ ЖАҢАЛЫҚ</span>
+    <div class="ticker-scroll">
+      <div class="ticker-track" id="ticker-track"></div>
+    </div>
+  </div>
+
+  <main class="container main-layout">
+    <div class="content-main">
+      <section id="hero" class="hero">
+        <p class="error-msg" style="padding:24px">Жаңалықтар жүктелуде...</p>
+      </section>
+      <section class="news-grid" id="news-grid"></section>
+    </div>
+
+    <aside class="sidebar">
+      <div class="widget">
+        <h2 class="widget-title">Әлеуметтік желілер</h2>
+        <div id="social-feed"><p class="social-empty">Жүктелуде...</p></div>
+      </div>
+      <div class="widget">
+        <h2 class="widget-title">Ең көп оқылған</h2>
+        <ul class="most-read-list" id="most-read-list"></ul>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo">
+            <img src="images/logo.png" alt="QULAN MEDIA" class="footer-logo-icon" />
+            QULAN <span>MEDIA</span>
+          </div>
+          <p class="footer-desc">
+            Қазақстанның өзекті жаңалықтар порталы. Қоғам, экономика, руханият және спорт туралы сенімді ақпарат.
+          </p>
+        </div>
+        <div class="footer-contact">
+          <h3 class="footer-heading">Байланыс</h3>
+          <p>info@qulanmedia.kz</p>
+          <p>+7 (717) 000-00-00</p>
+          <p>Астана, Қазақстан</p>
+        </div>
+        <div class="footer-social">
+          <h3 class="footer-heading">Әлеуметтік желілер</h3>
+          <a href="#">Instagram</a>
+          <a href="#">TikTok</a>
+          <a href="#">Telegram</a>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2026 QULAN MEDIA. Барлық құқықтар қорғалған.</p>
+    </div>
+  </footer>
+
+  <script src="js/csv.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
