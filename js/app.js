@@ -12,6 +12,35 @@ function parseBool(value) {
   return String(value).toUpperCase() === "TRUE";
 }
 
+const PLACEHOLDER_IMAGE =
+  "https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80";
+
+/** Google Drive сілтемесін тікелей JPEG/PNG көрсету форматына айналдыру */
+function convertDriveUrl(url) {
+  const fileMatch = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (fileMatch) return `https://drive.google.com/uc?export=view&id=${fileMatch[1]}`;
+  const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (idMatch && url.includes("drive.google.com")) {
+    return `https://drive.google.com/uc?export=view&id=${idMatch[1]}`;
+  }
+  return url;
+}
+
+/** imageJpeg (негізгі) немесе imageUrl (ескі) — JPEG/PNG сілтемесі */
+function resolveImageUrl(row) {
+  const raw = String(row.imageJpeg || row.imageUrl || "").trim();
+  if (!raw) return PLACEHOLDER_IMAGE;
+  return convertDriveUrl(raw);
+}
+
+function imgTag(src, alt, loading) {
+  const safeSrc = escapeHtml(src);
+  const safeAlt = escapeHtml(alt);
+  const fallback = escapeHtml(PLACEHOLDER_IMAGE);
+  const loadAttr = loading ? ` loading="${loading}"` : "";
+  return `<img src="${safeSrc}" alt="${safeAlt}"${loadAttr} onerror="this.onerror=null;this.src='${fallback}'" />`;
+}
+
 function escapeHtml(str) {
   return String(str)
     .replace(/&/g, "&amp;")
@@ -55,6 +84,7 @@ function normalizeArticles(rows) {
     views: Number(a.views) || 0,
     isFeatured: parseBool(a.isFeatured),
     isBreaking: parseBool(a.isBreaking),
+    imageUrl: resolveImageUrl(a),
   }));
 }
 
@@ -144,7 +174,7 @@ function renderHero(article) {
   hero.innerHTML = `
     <a href="${articleUrl(article)}" class="hero-link">
       <div class="hero-image-wrap">
-        <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" loading="eager" />
+        ${imgTag(article.imageUrl, article.title, "eager")}
         <span class="category-badge">${escapeHtml(article.category)}</span>
       </div>
       <div class="hero-body">
@@ -169,7 +199,7 @@ function renderGrid(articles) {
     <article class="news-card">
       <a href="${articleUrl(a)}" class="card-link">
         <div class="card-image">
-          <img src="${escapeHtml(a.imageUrl)}" alt="${escapeHtml(a.title)}" loading="lazy" />
+          ${imgTag(a.imageUrl, a.title, "lazy")}
         </div>
         <div class="card-body">
           <span class="card-category">${escapeHtml(a.category)}</span>
@@ -225,7 +255,7 @@ function renderArticlePage(article) {
         <span>${article.views.toLocaleString("kk-KZ")} көру</span>
       </div>
       <div class="article-image">
-        <img src="${escapeHtml(article.imageUrl)}" alt="${escapeHtml(article.title)}" />
+        ${imgTag(article.imageUrl, article.title)}
       </div>
       <p class="article-lead">${escapeHtml(article.summary)}</p>
       <div class="article-content">${escapeHtml(article.content).replace(/\n/g, "<br>")}</div>
