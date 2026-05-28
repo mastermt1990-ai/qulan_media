@@ -167,31 +167,13 @@ function renderTicker(articles) {
   track.innerHTML = items + items;
 }
 
-function renderHero(article) {
-  const hero = document.getElementById("hero");
-  if (!hero || !article) return;
-  hero.innerHTML = `
-    <a href="${articleUrl(article)}" class="hero-link">
-      <div class="hero-image-wrap">
-        ${imgTag(article.imageUrl, article.title, "eager")}
-        <span class="category-badge">${escapeHtml(article.category)}</span>
-      </div>
-      <div class="hero-body">
-        <h1 class="hero-title">${escapeHtml(article.title)}</h1>
-        <p class="hero-summary">${escapeHtml(article.summary)}</p>
-        <div class="hero-meta">
-          <span>${formatRelative(article.publishedAt)}</span>
-          <span class="meta-dot">•</span>
-          <span>${article.views.toLocaleString("kk-KZ")} көру</span>
-        </div>
-      </div>
-    </a>
-  `;
-}
-
 function renderGrid(articles) {
   const grid = document.getElementById("news-grid");
   if (!grid) return;
+  if (articles.length === 0) {
+    grid.innerHTML = '<p class="news-grid-loading">Жаңалықтар жоқ</p>';
+    return;
+  }
   grid.innerHTML = articles
     .map(
       (a) => `
@@ -199,11 +181,15 @@ function renderGrid(articles) {
       <a href="${articleUrl(a)}" class="card-link">
         <div class="card-image">
           ${imgTag(a.imageUrl, a.title, "lazy")}
+          <span class="category-badge">${escapeHtml(a.category)}</span>
         </div>
         <div class="card-body">
-          <span class="card-category">${escapeHtml(a.category)}</span>
           <h2 class="card-title">${escapeHtml(a.title)}</h2>
-          <time class="card-time">${formatRelative(a.publishedAt)}</time>
+          <div class="card-meta">
+            <time>${formatRelative(a.publishedAt)}</time>
+            <span class="meta-dot">•</span>
+            <span>${a.views.toLocaleString("kk-KZ")} көру</span>
+          </div>
         </div>
       </a>
     </article>
@@ -345,22 +331,19 @@ async function initHome() {
   setTodayDate();
   try {
     const articles = await loadArticles();
-    const featured = articles.find((a) => a.isFeatured) || articles[0];
-    const gridArticles = articles
-      .filter((a) => a !== featured)
+    const gridArticles = [...articles]
       .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
-      .slice(0, 4);
+      .slice(0, 6);
 
     renderTicker(articles);
-    renderHero(featured);
     renderGrid(gridArticles);
     renderMostRead(articles);
   } catch (err) {
     console.error(err);
-    const hero = document.getElementById("hero");
-    if (hero) {
-      hero.innerHTML =
-        '<p class="error-msg">Жаңалықтар жүктелмеді. <code>npx serve .</code> қолданыңыз. Google Sheets: Share → Anyone with the link (Viewer). Кесте: <a href="https://docs.google.com/spreadsheets/d/1IRJWxPyANfO0h0RVSc7sW7RgVcxehJdw4rUiYTUBFuA/edit">ашу</a></p>';
+    const grid = document.getElementById("news-grid");
+    if (grid) {
+      grid.innerHTML =
+        '<p class="news-grid-loading">Жаңалықтар жүктелмеді. Google Sheets: Share → Anyone with the link (Viewer).</p>';
     }
   }
 
