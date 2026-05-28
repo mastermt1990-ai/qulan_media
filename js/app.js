@@ -348,7 +348,8 @@ function renderVideos(videos) {
     return;
   }
   wrap.innerHTML = videos
-    .slice(0, 6)
+    .slice(-3)
+    .reverse()
     .map((v) => {
       const key = String(v.platform).toLowerCase();
       const meta = PLATFORM_META[key] || { label: v.platform || "Видео", color: "#555" };
