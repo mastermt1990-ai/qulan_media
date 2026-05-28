@@ -306,6 +306,40 @@ async function loadVideos() {
   }
 }
 
+function getYoutubeId(url) {
+  const patterns = [
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const re of patterns) {
+    const m = url.match(re);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+function buildVideoEmbed(v) {
+  const url = String(v.url).trim();
+  const key = String(v.platform).toLowerCase();
+
+  if (key === "youtube" || getYoutubeId(url)) {
+    const id = getYoutubeId(url);
+    if (id) {
+      return `<iframe class="video-frame" src="https://www.youtube.com/embed/${encodeURIComponent(id)}" title="${escapeHtml(v.title)}" loading="lazy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+    }
+  }
+
+  if (key === "facebook" || url.includes("facebook.com")) {
+    const src = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
+    return `<iframe class="video-frame" src="${src}" title="${escapeHtml(v.title)}" loading="lazy" frameborder="0" scrolling="no" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe>`;
+  }
+
+  return "";
+}
+
 function renderVideos(videos) {
   const wrap = document.getElementById("video-feed");
   if (!wrap) return;
@@ -318,14 +352,24 @@ function renderVideos(videos) {
     .map((v) => {
       const key = String(v.platform).toLowerCase();
       const meta = PLATFORM_META[key] || { label: v.platform || "Видео", color: "#555" };
-      return `<a class="sf-link-card sf-link-card--${key}" href="${escapeHtml(v.url)}" target="_blank" rel="noopener" style="--sf-accent:${meta.color}">
-        ${renderPlatformIcon(meta)}
-        <span class="sf-link-card__body">
-          <span class="sf-link-card__name">${escapeHtml(v.title)}</span>
-          <span class="sf-link-card__handle">${escapeHtml(meta.label)}</span>
-        </span>
-        <span class="sf-link-card__arrow" aria-hidden="true">↗</span>
-      </a>`;
+      const embed = buildVideoEmbed(v);
+      if (!embed) {
+        return `<a class="sf-link-card sf-link-card--${key}" href="${escapeHtml(v.url)}" target="_blank" rel="noopener" style="--sf-accent:${meta.color}">
+          ${renderPlatformIcon(meta)}
+          <span class="sf-link-card__body">
+            <span class="sf-link-card__name">${escapeHtml(v.title)}</span>
+            <span class="sf-link-card__handle">${escapeHtml(meta.label)}</span>
+          </span>
+          <span class="sf-link-card__arrow" aria-hidden="true">↗</span>
+        </a>`;
+      }
+      return `<div class="video-card" style="--sf-accent:${meta.color}">
+        <div class="video-frame-wrap">${embed}</div>
+        <a class="video-card__title" href="${escapeHtml(v.url)}" target="_blank" rel="noopener">
+          ${renderPlatformIcon(meta)}
+          <span>${escapeHtml(v.title)}</span>
+        </a>
+      </div>`;
     })
     .join("");
 }
