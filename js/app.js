@@ -265,10 +265,25 @@ function renderArticlePage(article) {
 /* ── Әлеуметтік желі посттары ── */
 
 const PLATFORM_META = {
-  instagram: { label: "Instagram", icon: "📸", color: "#833ab4" },
-  tiktok:    { label: "TikTok",    icon: "🎵", color: "#000"    },
-  facebook:  { label: "Facebook",  icon: "📘", color: "#1877f2" },
+  facebook:  { label: "Facebook",  iconImg: "images/facebook.png", color: "#1877f2", gradient: "linear-gradient(135deg, #1877f2 0%, #0d5bb5 100%)", handle: "Qulan Media" },
+  instagram: { label: "Instagram", iconImg: "images/instagram.png", color: "#833ab4", gradient: "linear-gradient(135deg, #405de6, #833ab4, #c13584)", handle: "@qulan_media" },
+  youtube:   { label: "YouTube",   iconImg: "images/youtube.png", color: "#ff0000", gradient: "linear-gradient(135deg, #ff0000 0%, #b31217 100%)", handle: "@qulanmedia" },
+  tiktok:    { label: "TikTok",    iconImg: "images/tiktok.png", color: "#010101", gradient: "linear-gradient(135deg, #010101 0%, #fe2c55 100%)", handle: "@qulan_media" },
 };
+
+function renderPlatformIcon(meta) {
+  if (meta.iconImg) {
+    return `<span class="sf-link-card__icon"><img src="${escapeHtml(meta.iconImg)}" alt="${escapeHtml(meta.label)}" /></span>`;
+  }
+  return `<span class="sf-link-card__icon sf-link-card__icon--emoji">${meta.icon}</span>`;
+}
+
+const SOCIAL_LINKS = [
+  { platform: "facebook",  url: "https://www.facebook.com/share/18XHZ1v9sL/" },
+  { platform: "instagram", url: "https://www.instagram.com/qulan_media?igsh=YXp4NzRxcTBibmRv" },
+  { platform: "youtube",   url: "https://youtube.com/@qulanmedia?si=CnHn5ytlNbEPgJux" },
+  { platform: "tiktok",    url: "https://www.tiktok.com/@qulan_media?_r=1&_t=ZS-96k2A5pnTL3" },
+];
 
 async function loadSocialPosts() {
   try {
@@ -284,7 +299,17 @@ function renderSocialFeed(posts) {
   const wrap = document.getElementById("social-feed");
   if (!wrap) return;
   if (posts.length === 0) {
-    wrap.innerHTML = '<p class="social-empty">Жаңалықтар жоқ</p>';
+    wrap.innerHTML = `<div class="sf-links">${SOCIAL_LINKS.map(({ platform, url }) => {
+      const meta = PLATFORM_META[platform];
+      return `<a class="sf-link-card sf-link-card--${platform}" href="${escapeHtml(url)}" target="_blank" rel="noopener" style="--sf-accent:${meta.color}">
+        ${renderPlatformIcon(meta)}
+        <span class="sf-link-card__body">
+          <span class="sf-link-card__name">${meta.label}</span>
+          <span class="sf-link-card__handle">${meta.handle}</span>
+        </span>
+        <span class="sf-link-card__arrow" aria-hidden="true">↗</span>
+      </a>`;
+    }).join("")}</div>`;
     return;
   }
   wrap.innerHTML = posts
@@ -298,10 +323,13 @@ function renderSocialFeed(posts) {
       const linkHtml = p.url
         ? `<a class="sf-link" href="${escapeHtml(p.url)}" target="_blank" rel="noopener">Толығырақ →</a>`
         : "";
+      const iconHtml = meta.iconImg
+        ? `<img class="sf-icon-img" src="${escapeHtml(meta.iconImg)}" alt="" />`
+        : `<span class="sf-icon">${meta.icon || "🔗"}</span>`;
       return `
       <div class="sf-card">
         <div class="sf-header" style="--sf-color:${meta.color}">
-          <span class="sf-icon">${meta.icon}</span>
+          ${iconHtml}
           <span class="sf-platform">${meta.label}</span>
           <span class="sf-date">${formatRelative(p.publishedAt || "")}</span>
         </div>
