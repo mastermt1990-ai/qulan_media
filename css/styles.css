@@ -122,6 +122,12 @@ img {
   color: var(--green);
 }
 
+.nav-main a.nav-active {
+  color: var(--green);
+  border-bottom: 2px solid var(--green);
+  padding-bottom: 2px;
+}
+
 .search-wrap {
   flex: 0 0 200px;
 }

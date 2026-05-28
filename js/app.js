@@ -376,17 +376,55 @@ function renderSocialFeed(posts) {
     .join("");
 }
 
+function highlightNav(activeCategory) {
+  const links = document.querySelectorAll(".nav-main a");
+  links.forEach((link) => {
+    let linkCat = null;
+    try {
+      linkCat = new URL(link.href, window.location.origin).searchParams.get("category");
+    } catch (e) {
+      linkCat = null;
+    }
+    if ((linkCat || null) === (activeCategory || null)) {
+      link.classList.add("nav-active");
+    } else {
+      link.classList.remove("nav-active");
+    }
+  });
+}
+
 async function initHome() {
   setTodayDate();
   try {
     const articles = await loadArticles();
-    const gridArticles = [...articles]
+
+    const params = new URLSearchParams(window.location.search);
+    const activeCategory = params.get("category");
+    highlightNav(activeCategory);
+
+    let filtered = [...articles];
+    if (activeCategory) {
+      filtered = filtered.filter(
+        (a) =>
+          String(a.category).trim().toUpperCase() ===
+          activeCategory.trim().toUpperCase()
+      );
+    }
+
+    const gridArticles = filtered
       .sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt))
-      .slice(0, 6);
+      .slice(0, 12);
 
     renderTicker(articles);
     renderGrid(gridArticles);
     renderMostRead(articles);
+
+    if (activeCategory && gridArticles.length === 0) {
+      const grid = document.getElementById("news-grid");
+      if (grid) {
+        grid.innerHTML = `<p class="news-grid-loading">«${escapeHtml(activeCategory)}» санатында жаңалық жоқ.</p>`;
+      }
+    }
   } catch (err) {
     console.error(err);
     const grid = document.getElementById("news-grid");
