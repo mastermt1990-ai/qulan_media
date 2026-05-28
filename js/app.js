@@ -2,8 +2,10 @@
 const SHEET_ID = "1IRJWxPyANfO0h0RVSc7sW7RgVcxehJdw4rUiYTUBFuA";
 const SHEET_GID = "0";          // 1-парақ: мақалалар
 const SOCIAL_GID = "1";         // 2-парақ: Instagram/TikTok/Facebook жаңалықтары
+const VIDEOS_GID = "2";         // 3-парақ: Facebook/YouTube бейнероликтері (platform, title, url)
 const SHEETS_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
 const SOCIAL_CSV_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SOCIAL_GID}`;
+const VIDEOS_CSV_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${VIDEOS_GID}`;
 const LOCAL_CSV_PATH = "data/articles.csv";
 
 let articlesCache = null;
@@ -281,6 +283,40 @@ async function loadSocialPosts() {
   }
 }
 
+async function loadVideos() {
+  try {
+    const text = await fetchCsvText(`${VIDEOS_CSV_URL}&_=${Date.now()}`);
+    return parseArticlesCsv(text).filter((r) => r.url && r.title);
+  } catch (err) {
+    console.warn("Бейнероликтер CSV:", err.message);
+    return [];
+  }
+}
+
+function renderVideos(videos) {
+  const wrap = document.getElementById("video-feed");
+  if (!wrap) return;
+  if (videos.length === 0) {
+    wrap.innerHTML = '<p class="social-empty">Бейнероликтер жоқ</p>';
+    return;
+  }
+  wrap.innerHTML = videos
+    .slice(0, 6)
+    .map((v) => {
+      const key = String(v.platform).toLowerCase();
+      const meta = PLATFORM_META[key] || { label: v.platform || "Видео", color: "#555" };
+      return `<a class="sf-link-card sf-link-card--${key}" href="${escapeHtml(v.url)}" target="_blank" rel="noopener" style="--sf-accent:${meta.color}">
+        ${renderPlatformIcon(meta)}
+        <span class="sf-link-card__body">
+          <span class="sf-link-card__name">${escapeHtml(v.title)}</span>
+          <span class="sf-link-card__handle">${escapeHtml(meta.label)}</span>
+        </span>
+        <span class="sf-link-card__arrow" aria-hidden="true">↗</span>
+      </a>`;
+    })
+    .join("");
+}
+
 function renderSocialFeed(posts) {
   const wrap = document.getElementById("social-feed");
   if (!wrap) return;
@@ -348,6 +384,7 @@ async function initHome() {
   }
 
   loadSocialPosts().then(renderSocialFeed);
+  loadVideos().then(renderVideos);
 }
 
 async function initArticle() {
