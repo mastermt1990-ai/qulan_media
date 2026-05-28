@@ -2,7 +2,7 @@
 const SHEET_ID = "1IRJWxPyANfO0h0RVSc7sW7RgVcxehJdw4rUiYTUBFuA";
 const SHEET_GID = "0";          // 1-парақ: мақалалар
 const SOCIAL_GID = "1";         // 2-парақ: Instagram/TikTok/Facebook жаңалықтары
-const VIDEOS_GID = "2";         // 3-парақ: Facebook/YouTube бейнероликтері (platform, title, url)
+const VIDEOS_GID = "2128631468"; // 3-парақ: Facebook/YouTube бейнероликтері (platform, title, url)
 const SHEETS_CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
 const SOCIAL_CSV_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SOCIAL_GID}`;
 const VIDEOS_CSV_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${VIDEOS_GID}`;
@@ -283,10 +283,23 @@ async function loadSocialPosts() {
   }
 }
 
+function parseVideosCsv(text) {
+  const lines = text.split(/\r?\n/).filter((line) => line.trim() !== "");
+  let startIdx = 0;
+  for (let i = 0; i < lines.length; i++) {
+    const first = lines[i].split(",")[0].replace(/^"|"$/g, "").trim().toLowerCase();
+    if (first === "platform") {
+      startIdx = i;
+      break;
+    }
+  }
+  return parseCSV(lines.slice(startIdx).join("\n"));
+}
+
 async function loadVideos() {
   try {
     const text = await fetchCsvText(`${VIDEOS_CSV_URL}&_=${Date.now()}`);
-    return parseArticlesCsv(text).filter((r) => r.url && r.title);
+    return parseVideosCsv(text).filter((r) => r.url && r.title);
   } catch (err) {
     console.warn("Бейнероликтер CSV:", err.message);
     return [];
