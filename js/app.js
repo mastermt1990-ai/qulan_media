@@ -321,6 +321,11 @@ function getYoutubeId(url) {
   return null;
 }
 
+function getTiktokId(url) {
+  const m = url.match(/tiktok\.com\/(?:@[\w.-]+\/video|video|embed\/v2)\/(\d+)/);
+  return m ? m[1] : null;
+}
+
 function buildVideoEmbed(v) {
   const url = String(v.url).trim();
   const key = String(v.platform).toLowerCase();
@@ -328,16 +333,32 @@ function buildVideoEmbed(v) {
   if (key === "youtube" || getYoutubeId(url)) {
     const id = getYoutubeId(url);
     if (id) {
-      return `<iframe class="video-frame" src="https://www.youtube.com/embed/${encodeURIComponent(id)}" title="${escapeHtml(v.title)}" loading="lazy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+      return {
+        html: `<iframe class="video-frame" src="https://www.youtube.com/embed/${encodeURIComponent(id)}" title="${escapeHtml(v.title)}" loading="lazy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`,
+        vertical: false,
+      };
+    }
+  }
+
+  if (key === "tiktok" || url.includes("tiktok.com")) {
+    const id = getTiktokId(url);
+    if (id) {
+      return {
+        html: `<iframe class="video-frame" src="https://www.tiktok.com/embed/v2/${id}" title="${escapeHtml(v.title)}" loading="lazy" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`,
+        vertical: true,
+      };
     }
   }
 
   if (key === "facebook" || url.includes("facebook.com")) {
     const src = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false`;
-    return `<iframe class="video-frame" src="${src}" title="${escapeHtml(v.title)}" loading="lazy" frameborder="0" scrolling="no" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe>`;
+    return {
+      html: `<iframe class="video-frame" src="${src}" title="${escapeHtml(v.title)}" loading="lazy" frameborder="0" scrolling="no" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe>`,
+      vertical: false,
+    };
   }
 
-  return "";
+  return null;
 }
 
 function renderVideos(videos) {
@@ -364,8 +385,9 @@ function renderVideos(videos) {
           <span class="sf-link-card__arrow" aria-hidden="true">↗</span>
         </a>`;
       }
+      const wrapClass = embed.vertical ? "video-frame-wrap is-tiktok" : "video-frame-wrap";
       return `<div class="video-card" style="--sf-accent:${meta.color}">
-        <div class="video-frame-wrap">${embed}</div>
+        <div class="${wrapClass}">${embed.html}</div>
         <a class="video-card__title" href="${escapeHtml(v.url)}" target="_blank" rel="noopener">
           ${renderPlatformIcon(meta)}
           <span>${escapeHtml(v.title)}</span>

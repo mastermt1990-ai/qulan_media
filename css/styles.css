@@ -507,6 +507,11 @@ img {
   background: #000;
 }
 
+.video-frame-wrap.is-tiktok {
+  aspect-ratio: 9 / 16;
+  max-height: 580px;
+}
+
 .video-frame {
   position: absolute;
   inset: 0;
